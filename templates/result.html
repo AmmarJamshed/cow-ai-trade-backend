@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Match Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+    <h1>Match Result</h1>
+</header>
+
+<div class="container result">
+
+    <h2>Similarity Score</h2>
+    <p><strong>{{ similarity }}%</strong></p>
+
+    {% if allowed %}
+        <p class="success">✅ Trade Allowed</p>
+        <p>The cow meets the required similarity threshold.</p>
+    {% else %}
+        <p class="failure">❌ Trade Rejected</p>
+        <p>Similarity below 80%. Please upload a clearer image.</p>
+    {% endif %}
+
+    <br>
+    <a href="/">
+        <button>Go Back</button>
+    </a>
+
+</div>
+
+</body>
+</html>

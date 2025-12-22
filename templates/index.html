@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Livestock Trading App</title>
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: linear-gradient(135deg, #0f766e, #115e59);
+      margin: 0;
+      padding: 0;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 50px auto;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 30px 35px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    h1 {
+      text-align: center;
+      color: #064e3b;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #475569;
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: #e5e7eb;
+      margin: 30px 0;
+    }
+
+    h3 {
+      color: #065f46;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 10px 0 15px 0;
+    }
+
+    button {
+      background: #0f766e;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover {
+      background: #115e59;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 5px;
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .flash.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border-left: 5px solid #10b981;
+    }
+
+    .flash.info {
+      background: #eff6ff;
+      color: #1e40af;
+      border-left: 5px solid #3b82f6;
+    }
+
+    .flash.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border-left: 5px solid #ef4444;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 35px;
+      font-size: 12px;
+      color: #cbd5f5;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>🐄 Livestock Trading App</h1>
+  <div class="subtitle">
+    AI-powered cow verification & matching
+  </div>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <hr>
+
+  <!-- Seller Section -->
+  <div class="card">
+    <h3>Seller Upload</h3>
+    <form method="POST" action="/upload_seller" enctype="multipart/form-data">
+      <input type="file" name="seller_image" required>
+      <button type="submit">Upload Seller Cow</button>
+    </form>
+    <div class="hint">
+      • Upload a clear, full-body cow image<br>
+      • Side view preferred
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Buyer Section -->
+  <div class="card">
+    <h3>Buyer Upload</h3>
+    <form method="POST" action="/upload_buyer" enctype="multipart/form-data">
+      <input type="file" name="buyer_image" required>
+      <button type="submit">Check Match</button>
+    </form>
+    <div class="hint">
+      • Upload the cow image to compare against seller listing
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2025 • Livestock AI Marketplace
+</footer>
+
+</body>
+</html>
