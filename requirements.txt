@@ -1,9 +1,4 @@
 flask
 flask-cors
-gunicorn
 requests
-roboflow
-inference
-numpy
-pillow
-opencv-python-headless
+gunicorn
