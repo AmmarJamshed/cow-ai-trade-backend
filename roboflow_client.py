@@ -3,7 +3,7 @@ import base64
 import os
 
 ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
-MODEL = "coursemon/1"   # change if your model version is different
+MODEL = "cows-mien3-33bgs/1"  # change if your model version is different
 
 def detect_cow_features(image_path):
     with open(image_path, "rb") as f:
