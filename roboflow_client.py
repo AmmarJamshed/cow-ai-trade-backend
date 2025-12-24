@@ -2,49 +2,40 @@ import requests
 import base64
 import os
 
-ROBOFLOW_API_KEY = os.environ.get("ROBOFLOW_API_KEY")
-WORKFLOW_URL = "https://serverless.roboflow.com/coursemon/workflows/detect-and-classify-2"
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
+MODEL = "coursemon/1"   # change if your model version is different
 
 def detect_cow_features(image_path):
     with open(image_path, "rb") as f:
-        image_base64 = base64.b64encode(f.read()).decode("utf-8")
+        encoded = base64.b64encode(f.read()).decode("utf-8")
 
-    payload = {
-        "api_key": ROBOFLOW_API_KEY,
-        "inputs": {
-            "image": {
-                "type": "base64",
-                "value": image_base64
-            }
-        }
-    }
+    url = f"https://detect.roboflow.com/{MODEL}?api_key={ROBOFLOW_API_KEY}"
 
-    response = requests.post(WORKFLOW_URL, json=payload, timeout=30)
+    response = requests.post(
+        url,
+        json={"image": encoded},
+        headers={"Content-Type": "application/json"},
+        timeout=30
+    )
 
     if response.status_code != 200:
         print("Roboflow error:", response.text)
         return None
 
-    result = response.json()
+    data = response.json()
 
-    try:
-        detections = result["outputs"][0]["predictions"]
-        if not detections:
-            return None
-
-        cow = detections[0]
-
-        return {
-            "cow_confidence": cow["confidence"],
-            "bbox": [
-                cow["x"],
-                cow["y"],
-                cow["width"],
-                cow["height"]
-            ],
-            "disease": cow.get("class", None)
-        }
-
-    except Exception as e:
-        print("Parse error:", e)
+    if "predictions" not in data or len(data["predictions"]) == 0:
         return None
+
+    p = data["predictions"][0]
+
+    return {
+        "cow_confidence": p.get("confidence", 0),
+        "bbox": [
+            p.get("x", 0),
+            p.get("y", 0),
+            p.get("width", 0),
+            p.get("height", 0),
+        ],
+        "disease": p.get("class", None)
+    }
