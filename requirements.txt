@@ -1,6 +1,9 @@
 flask
 flask-cors
 gunicorn
-numpy
-opencv-python
+requests
 roboflow
+inference-sdk
+numpy
+pillow
+opencv-python-headless
