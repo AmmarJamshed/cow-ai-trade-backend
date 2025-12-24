@@ -1,59 +1,50 @@
 import requests
+import base64
+import os
 
-from inference_sdk import InferenceHTTPClient
-
-# Initialize client ONCE
-client = InferenceHTTPClient(
-    api_url="https://serverless.roboflow.com",
-    api_key="DP9CNOSQHY2lZfpyJ0nI"
-)
-
-WORKSPACE = "coursemon"
-WORKFLOW_ID = "detect-and-classify-2"
+ROBOFLOW_API_KEY = os.environ.get("ROBOFLOW_API_KEY")
+WORKFLOW_URL = "https://serverless.roboflow.com/coursemon/workflows/detect-and-classify-2"
 
 def detect_cow_features(image_path):
-    result = client.run_workflow(
-        workspace_name=WORKSPACE,
-        workflow_id=WORKFLOW_ID,
-        images={"image": image_path},
-        use_cache=True
-    )
+    with open(image_path, "rb") as f:
+        image_base64 = base64.b64encode(f.read()).decode("utf-8")
 
-    if not result or not isinstance(result, list):
-        return None
-
-    run = result[0]
-
-    detection = run.get("detection_predictions")
-    if not detection:
-        return None
-
-    preds = detection.get("predictions", [])
-    if not preds:
-        return None
-
-    cow = max(preds, key=lambda d: d.get("confidence", 0))
-
-    cow_confidence = cow.get("confidence", 0)
-    bbox = [
-        cow.get("x", 0),
-        cow.get("y", 0),
-        cow.get("width", 0),
-        cow.get("height", 0),
-    ]
-
-    disease_label = None
-    disease_conf = 0
-
-    cls = run.get("classification_predictions", [])
-    if cls:
-        pred = cls[0].get("predictions", {})
-        disease_label = pred.get("top")
-        disease_conf = pred.get("confidence", 0)
-
-    return {
-        "cow_confidence": cow_confidence,
-        "bbox": bbox,
-        "disease": disease_label,
-        "disease_confidence": disease_conf,
+    payload = {
+        "api_key": ROBOFLOW_API_KEY,
+        "inputs": {
+            "image": {
+                "type": "base64",
+                "value": image_base64
+            }
+        }
     }
+
+    response = requests.post(WORKFLOW_URL, json=payload, timeout=30)
+
+    if response.status_code != 200:
+        print("Roboflow error:", response.text)
+        return None
+
+    result = response.json()
+
+    try:
+        detections = result["outputs"][0]["predictions"]
+        if not detections:
+            return None
+
+        cow = detections[0]
+
+        return {
+            "cow_confidence": cow["confidence"],
+            "bbox": [
+                cow["x"],
+                cow["y"],
+                cow["width"],
+                cow["height"]
+            ],
+            "disease": cow.get("class", None)
+        }
+
+    except Exception as e:
+        print("Parse error:", e)
+        return None
